@@ -41,8 +41,14 @@
   (search [this field-name term]
           [this index-name field-name term])
   (search-all [this] [this index-name])
+  (search-fuzzy [this field-name term]
+                [this index-name field-name term])
+  (search-regex [this field-name re]
+                [this index-name field-name re])
   (search-term [this field-name term]
-               [this index-name field-name term]))
+               [this index-name field-name term])
+  (search-wildcard [this field-name query]
+                   [this index-name field-name query]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;   Implementation   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -153,10 +159,7 @@
   ([this field-name term]
     (-search this nil field-name term))
   ([this index-name field-name term]
-    (-> (search* this (search/match index-name field-name term))
-        first
-        (.getSourceAsString)
-        (json/parse-string true))))
+    (search* this (search/match index-name field-name term))))
 
 (defn -search-all
   ([this]
@@ -164,11 +167,29 @@
   ([this index-name]
     (search* this (search/match-all index-name))))
 
+(defn -search-fuzzy
+  ([this field-name term]
+    (-search-fuzzy this nil field-name term))
+  ([this index-name field-name term]
+    (search* this (search/fuzzy index-name field-name term))))
+
+(defn -search-regex
+  ([this field-name term]
+    (-search-regex this nil field-name term))
+  ([this index-name field-name term]
+    (search* this (search/regex index-name field-name term))))
+
 (defn -search-term
   ([this field-name term]
     (-search-term this nil field-name term))
   ([this index-name field-name term]
     (search* this (search/term index-name field-name term))))
+
+(defn -search-wildcard
+  ([this field-name query]
+    (-search-wildcard this nil field-name query))
+  ([this index-name field-name query]
+    (search* this (search/wildcard index-name field-name query))))
 
 (def behaviour
   {:bulk -bulk
@@ -186,7 +207,10 @@
    :put-pipeline -put-pipeline
    :search -search
    :search-all -search-all
+   :search-fuzzy -search-fuzzy
+   :search-regex -search-regex
    :search-term -search-term
+   :search-wildcard -search-wildcard
    :update-document -update-document
    :upsert-document -upsert-document})
 
