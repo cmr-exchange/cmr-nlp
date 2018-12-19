@@ -7,7 +7,7 @@
        "geoname" : {
         "properties" : {
           "geonameid" : {"type" : "keyword", "index": "true"},
-          "name" : {"type" : "text"},
+          "name" : {"type" : "text", "index": "true"},
           "asciiname" : {"type" : "text"},
           "alternativenames" : {"type" : "text", "similarity" : "boolean"},
           "coordinates" : {"type" : "geo_point"},
