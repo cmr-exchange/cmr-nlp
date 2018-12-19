@@ -49,7 +49,7 @@ Supported versions:
 
 | cmr-nlp        | Elasticsearch | Status         |
 |----------------|---------------|----------------|
-| 0.1.0-SNAPSHOT | 6.5.2         | In development |
+| 0.1.0-SNAPSHOT | 6.5.4         | In development |
 
 
 ## Usage [&#x219F;](#contents)
