@@ -2,6 +2,7 @@
   (:require
    [cheshire.core :as json]
    [clojure.java.io :as io]
+   [clojure.string :as string]
    [cmr.mission-control.components.pubsub :as pubsub]
    [cmr.nlp.components.config :as config]
    [cmr.nlp.elastic.client.core :as client]
@@ -19,6 +20,22 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (def get-conn #(get-in % [:elastic :conn]))
+
+(defn assoc-altnames
+  [geoname-data]
+  (let [altnames (or (:alternativenames geoname-data) "")]
+    (assoc geoname-data
+           :alternativenames
+           (string/split altnames #","))))
+
+(defn assoc-coords
+  [geoname-data]
+  (-> geoname-data
+      (assoc :coordinates
+             (format "%s,%s"
+                     (:latitude geoname-data)
+                     (:longitude geoname-data)))
+      (dissoc :latitude :longitude)))
 
 (defn assoc-shape
   [geoname-data shapes-data]
@@ -40,6 +57,8 @@
 (defn ingest-transducer
   [shapes]
   (comp
+    (map #(assoc-altnames %))
+    (map #(assoc-coords %))
     (map #(assoc-shape % shapes))
     (map json/generate-string)
     (map add-document)))
@@ -74,8 +93,8 @@
       (log/trace "Got system keys:" (keys system))
       (log/trace "Got elastic:" (:elastic system))
       (log/trace "Got connection:" conn)
-      (log/debug "Got method:" method)
-      (log/debug "Got args:" args)
+      (log/trace "Got method:" method)
+      (log/trace "Got args:" args)
       (apply method (concat [conn] args)))))
 
 (defn add-geonames-index

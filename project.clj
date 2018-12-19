@@ -98,7 +98,7 @@
     :ingest {
       :main cmr.nlp.elastic.ingest
       :jvm-opts ^replace [
-        "-Dlogging.level=debug"
+        "-Dlogging.level=info"
         "-Dlogging.color=true"]}}
   :aliases {
     ;; Dev & Testing Aliases
